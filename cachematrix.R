@@ -1,22 +1,30 @@
-## Put comments here that give an overall description of what your
-## functions do
+## These functions work together to improve the performance of programs
+## that need to perform matrix inversions of matrices whose inversions
+## may have been previously computed.
 
-## Creates a special type of matrix object, called a CacheMatrix, 
-## which can cache its inverse matrix.
+## Creates a special type of matrix, called a CacheMatrix, which can 
+## cache its inverse matrix.
 
 makeCacheMatrix <- function(x = matrix()) {
-  cacheMatrix <- NULL
+
+  # initialize
   inverseMatrix <- NULL
   
+  # set function which can be used as an alternate input for the matrix
+  # to be inverted. It re-initializes the inverseMatrix to NULL so that
+  # an older inverted matrix is not returned incorrectly.
   set <- function(aMatrix) {
-    cacheMatrix <<- aMatrix
+    x <<- aMatrix
     inverseMatrix <<- NULL
   }
   
+  # returns the matrix passed as an argument to makeCacheMatrix
   get <- function() x
   
+  # assigns the passed-in matrix to be the inverseMatrix (of x)
   setInverse <- function(inverse) inverseMatrix <<- inverse
   
+  # returns the inverse matrix
   getInverse <- function() inverseMatrix
   
   list(set = set, get = get,
@@ -32,20 +40,25 @@ makeCacheMatrix <- function(x = matrix()) {
 ## and returned.
 ##
 ## PreCondition: The matrix, x, is invertible
+
 cacheSolve <- function(x, ...) {
         ## Return a matrix that is the inverse of 'x'
 
+  # Retrieve the inverse matrix of x and if it is not NULL
+  # return it.
   inv <- x$getInverse()
   if (!is.null(inv)) {
-    message("getting cached data")
-    return(inv)
+      return(inv)
   }
   
-  # get the inverse
+  # If we made it here, then the CacheMatrix, x, has not yet been inverted.
+  # Retrieve the original matrix (pre-inverted) and invert it.
   data <- x$get()
   inv <- solve(data)
   
-  x$setInverse(inv)  # cache inv
+  # Assign the inverted matrix to be the cached one
+  x$setInverse(inv)
   
-  inv  # returns inv
+  # returns the inverted matrix
+  inv
 }
